@@ -22,9 +22,9 @@ namespace ReactBlog
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddMvc(); - TODO: разобраться подробнее что за методы предоставляет сервис.
-            services.AddControllers();
-            services.AddScoped<IRepositoryContextFactory, RepositoryContextFactory>();
+            services.AddMvc(); 
+           //services.AddControllers();
+           services.AddScoped<IRepositoryContextFactory, RepositoryContextFactory>();
             services.AddScoped<IBlogRepository>(
                 provider => new BlogRepository(
                     Configuration.GetConnectionString("Database"), 
@@ -47,10 +47,10 @@ namespace ReactBlog
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                //endpoints.MapControllerRoute(
+                //    name: "default",
+                //    pattern: "{controller=Home}/{action=Index}/{Id?}"
+                //    );
 
                 endpoints.MapControllerRoute(
                     name: "DefaultApi",
