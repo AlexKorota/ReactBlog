@@ -7,6 +7,7 @@ using DBRepository.Interfaces;
 using DBRepository.Factories;
 using DBRepository.Repositories;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace ReactBlog
 {
@@ -21,6 +22,7 @@ namespace ReactBlog
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddMvc(); - TODO: разобраться подробнее что за методы предоставляет сервис.
             services.AddControllers();
             services.AddScoped<IRepositoryContextFactory, RepositoryContextFactory>();
             services.AddScoped<IBlogRepository>(
@@ -31,11 +33,14 @@ namespace ReactBlog
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        [Obsolete("UseWebpackDevMiddleware is deprecated. Need to find smthing else")]
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseWebpackDevMiddleware();
+
             }
             app.UseStaticFiles();
             app.UseRouting();
@@ -49,8 +54,8 @@ namespace ReactBlog
 
                 endpoints.MapControllerRoute(
                     name: "DefaultApi",
-                    pattern: "api/{controller}/{action}/{id?}"
-                    );
+                    pattern: "api/{controller}/{action}");
+                endpoints.MapFallbackToController("Index" , "Home");
             });
         }
     }
