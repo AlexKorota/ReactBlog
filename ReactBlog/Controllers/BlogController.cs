@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ReactBlog.Controllers
 {
-    public class BlogController
+    public class BlogController : Controller
     {
         IBlogRepository _blogRepository;
 

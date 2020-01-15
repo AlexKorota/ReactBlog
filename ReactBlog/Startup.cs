@@ -8,6 +8,9 @@ using DBRepository.Factories;
 using DBRepository.Repositories;
 using Microsoft.Extensions.Configuration;
 using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ReactBlog
 {
@@ -22,11 +25,26 @@ namespace ReactBlog
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(); 
-           //services.AddControllers();
-           services.AddScoped<IRepositoryContextFactory, RepositoryContextFactory>();
-            services.AddScoped<IBlogRepository>(
-                provider => new BlogRepository(
+            services.AddMvc();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "ValidIssuer",
+                    ValidAudience = "ValidateAudience",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("IssuerSigningSecretKey")),
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+            services.AddScoped<IRepositoryContextFactory, RepositoryContextFactory>();
+                services.AddScoped<IBlogRepository>(
+                    provider => new BlogRepository(
                     Configuration.GetConnectionString("Database"), 
                     provider.GetService<IRepositoryContextFactory>()
                     )); 
@@ -43,6 +61,7 @@ namespace ReactBlog
 
             }
             app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
